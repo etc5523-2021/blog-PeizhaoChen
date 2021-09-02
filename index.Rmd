@@ -21,8 +21,31 @@ library(DT)
 
 ```{r}
 
-case_data<-read.csv("data/coronavirus.csv")
-vaccine_data<-read.csv("data/covid19_vaccine.csv")
+case_data<-read.csv("data/coronavirus.csv")%>%
+  filter(country =="Dominican Republic")%>%
+  select("date",
+         "country",
+         "type",
+         "cases")%>%
+  separate(col= date,
+           into = c("year","month","day")
+           , "-")%>%
+  group_by(type,
+           year,
+           month)%>%
+  summarise(monthly_cases=sum(cases))%>%
+  unite("time", year, month,sep='-')
+
+case_data_wider<-case_data%>%
+  pivot_wider(id_cols = type,
+              names_from = time,
+              values_from = monthly_cases)
+  
+
+
+vaccine_data<-read.csv("data/covid19_vaccine.csv")%>%
+  filter(country_region =="Dominican Republic")%>%
+  select(1:5)
 
 
 ```
