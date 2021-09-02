@@ -6,8 +6,14 @@ output_dir: "_site"
 navbar:
   title: "Peizhao Chen's Blog"
   right:
-    - text: "Home"
+    - text: "Pandemic in Donimican Republic"
       href: index.html
     - text: "About"
       href: about.html
-output: distill::distill_article
+output:
+  distill::distill_article:
+  html_document:
+    theme: cosmo
+    include: 
+      after_body: footer.html
+   

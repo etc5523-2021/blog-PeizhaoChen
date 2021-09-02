@@ -3,3 +3,27 @@ title: "Blog Dominican"
 site: distill::distill_website
 listing: posts
 ---
+
+# Data Description
+
+```{r}
+
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
+library(gt)
+library(DT)
+
+```
+
+
+```{r}
+
+case_data<-read.csv("data/coronavirus.csv")
+vaccine_data<-read.csv("data/covid19_vaccine.csv")
+
+
+```
+
