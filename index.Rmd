@@ -37,8 +37,8 @@ case_data<-read.csv("data/coronavirus.csv")%>%
   unite("time", year, month,sep='-')
 
 case_data_wider<-case_data%>%
-  pivot_wider(id_cols = type,
-              names_from = time,
+  pivot_wider(id_cols = time,
+              names_from = type,
               values_from = monthly_cases)
   
 
@@ -47,6 +47,18 @@ vaccine_data<-read.csv("data/covid19_vaccine.csv")%>%
   filter(country_region =="Dominican Republic")%>%
   select(1:5)
 
+
+```
+
+```{r}
+
+
+datatable(case_data_wider, 
+          options = list(pageLength = 6),
+          caption = 'The Covid19 Case in Dominican Republic',
+          filter = 'top',
+          colnames = c('Time', 'Confirmed', 'Death', 'Recovered'))
+  
 
 ```
 
