@@ -2,7 +2,6 @@
 title: "Blog Dominican Republic"
 site: distill::distill_website
 listing: posts
-output: html_document
 ---
 
 # Data Description
@@ -18,7 +17,8 @@ library(tidyverse)
 library(kableExtra)
 library(gt)
 library(DT)
-
+library(knitr)
+library(rpubs)
 ```
 
 
@@ -83,7 +83,8 @@ vaccine_data<-read.csv("data/covid19_vaccine.csv")%>%
 
 ```
  
-(tips:There is suppose to have a interactive DT table,but due to certain unknown technical issues my R studio can not output the outcome of code on HTML,but the DT table dose exist in the Rmd file.I have pose this issue on discussion forum but it is a little bit of late.You can check in the Rmd file.)
+(Notification:There is suppose to have a interactive DT table,but due to certain unknown technical issues my R studio can not output the outcome of code on HTML,but the DT table dose exist in the Rmd file.I have pose this issue on discussion forum but it is a little bit of late.You can check in the Rmd file.
+And the RPubs option in my Rstudio disappears, according to other users in RStudio community, they said the option for RPubs is no longer available in version 1.2.5033 ,so i am sorry for can not providing the URL.And i reckon that my previous issue is also attribute to the version.Here is the website of discussion https://community.rstudio.com/t/the-rpubs-bottom-disappeared/55404)
 
 ```{r}
 
