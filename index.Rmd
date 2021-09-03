@@ -1,16 +1,17 @@
 ---
-title: "Blog Dominican"
+title: "Blog Dominican Republic"
 site: distill::distill_website
 listing: posts
+output: html_document
 ---
 
 # Data Description
 
-```{r}
+# Table Presentation
+```{r echo = FALSE,message=FALSE,warning=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE,options(scipen=200))
 
-library(ggplot2)
 library(tidyverse)
 library(kableExtra)
 library(gt)
@@ -46,47 +47,121 @@ case_data_wider<-case_data%>%
 
 vaccine_data<-read.csv("data/covid19_vaccine.csv")%>%
   filter(country_region =="Dominican Republic")%>%
-  separate(col= date,
-           into = c("month","day","year")
-           , "/")%>%
-  select("year",
-         "month",
-         "day",
-         5:7)%>%
-  group_by(year,
-           month)%>%
-  summarise(monthly_doses_admin=sum(doses_admin),
-            monthly_people_partially_vaccinated=sum(people_partially_vaccinated),
-            monthly_people_fully_vaccinated=sum(people_fully_vaccinated))%>%
-  unite("time", year, month,sep='-')
-
+  select(2:5)%>%
+  filter(date %in% c("2/15/2021",
+                     "2/28/2021",
+                     "3/15/2021",
+                     "3/30/2021",
+                     "4/15/2021",
+                     "4/30/2021",
+                     "5/15/2021",
+                     "5/30/2021",
+                     "6/15/2021",
+                     "6/30/2021",
+                     "7/15/2021",
+                     "7/30/2021",
+                     "8/15/2021",
+                     "8/30/2021"
+                     ))
 
 ```
 
 ```{r}
 
-
-datatable(case_data_wider, 
+ case_table<-DT::datatable(
+          head(case_data_wider),
+          escape = FALSE,
+          class = 'cell-border stripe',
           options = list(pageLength = 6),
           caption = 'The Covid19 Case in Dominican Republic',
           filter = 'top',
           colnames = c('Time', 'Confirmed', 'Death', 'Recovered'))
-  
+
+case_table
 
 ```
+
 
 ```{r}
 
 gt(vaccine_data) %>% 
-  tab_header(title = "Number of Vaccinated People in Dominican Republic",
+  tab_header(title = "Number of Vaccinated People in Dominican Republic(Accumulated)",
              subtitle = "Data collected monthly from February to August 2021") %>% 
   tab_source_note(md("Source: https://github.com/RamiKrispin/coronavirus")) %>% 
   cols_label(
-    time = html("Month"),
-    monthly_doses_admin = html("Doses_admin"),
-    monthly_people_partially_vaccinated = html("Partially_vaccinated"),
-    monthly_people_fully_vaccinated = html("Fully_vaccinated")
+    date = html("Date"),
+    doses_admin = html("Doses_admin"),
+    people_partially_vaccinated = html("Partially_vaccinated"),
+    people_fully_vaccinated = html("Fully_vaccinated")
   )
+
+
+
+```
+
+```{r}
+vaccine_data2<-read.csv("data/covid19_vaccine.csv")%>%
+  filter(country_region =="Dominican Republic")%>%
+  select(2:5)%>%
+  filter(date %in% c("2/28/2021",
+                     "3/30/2021",
+                     "4/30/2021",
+                     "5/30/2021",
+                     "6/30/2021",
+                     "7/30/2021",
+                     "8/30/2021"
+                     ))%>%
+  pivot_longer(cols = -date,
+               names_to = "Type",
+               values_to = "cases")%>%
+  pivot_wider(id_cols = Type,
+              names_from = date,
+              values_from = cases)%>%
+  rename(Februray="2/28/2021",
+         March="3/30/2021",
+         April="4/30/2021",
+         May="5/30/2021",
+         June="6/30/2021",
+         July="7/30/2021",
+         August ="8/30/2021")%>%
+  mutate('2021-03'=March-Februray,
+         "2021-04"=April-March,
+         "2021-05"=May-April,
+         "2021-06"=June-May,
+         "2021-07"=July-June,
+         "2021-08"=August-July)%>%
+  select(Type,
+         9:14)%>%
+  pivot_longer(cols = -Type,
+               names_to = "time",
+               values_to = "vaccinated_people")%>%
+  pivot_wider(id_cols = time,
+              names_from = Type,
+              values_from = vaccinated_people)
+```
+
+
+```{r}
+lm_data<-left_join(case_data_wider,vaccine_data2,by="time")%>%
+  filter(time %in% c("2021-03",
+                   "2021-04",
+                   "2021-05",
+                   "2021-06",
+                   "2021-07",
+                   "2021-08"))%>%
+  mutate('Confirmed_rate'= confirmed/10627200,
+         'Death_rate'= death/10627200,
+         'Recovered_rate'= recovered/10627200,
+         'Confirmed_rate'= confirmed/10627200,
+         'Monthly_fully_vaccinated_rate'= people_fully_vaccinated/10627200,
+         )
+
+m <- lm(Monthly_fully_vaccinated_rate ~  Confirmed_rate + Death_rate + Recovered_rate, data = lm_data)
+d <- coef(summary(m))
+knitr::kable(d, booktabs = TRUE, caption = 'The estimated linear model for the vaccination rate')%>%
+  kable_styling(c("basic",
+                  fixed_thead = TRUE),
+                latex_options = "HOLD_position")
 
 ```
 
