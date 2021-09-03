@@ -20,7 +20,6 @@ library(DT)
 
 
 ```{r}
-
 case_data<-read.csv("data/coronavirus.csv")%>%
   filter(country =="Dominican Republic")%>%
   select("date",
@@ -40,12 +39,26 @@ case_data_wider<-case_data%>%
   pivot_wider(id_cols = time,
               names_from = type,
               values_from = monthly_cases)
-  
+```
 
+
+```{r}
 
 vaccine_data<-read.csv("data/covid19_vaccine.csv")%>%
   filter(country_region =="Dominican Republic")%>%
-  select(1:5)
+  separate(col= date,
+           into = c("month","day","year")
+           , "/")%>%
+  select("year",
+         "month",
+         "day",
+         5:7)%>%
+  group_by(year,
+           month)%>%
+  summarise(monthly_doses_admin=sum(doses_admin),
+            monthly_people_partially_vaccinated=sum(people_partially_vaccinated),
+            monthly_people_fully_vaccinated=sum(people_fully_vaccinated))%>%
+  unite("time", year, month,sep='-')
 
 
 ```
@@ -59,6 +72,21 @@ datatable(case_data_wider,
           filter = 'top',
           colnames = c('Time', 'Confirmed', 'Death', 'Recovered'))
   
+
+```
+
+```{r}
+
+gt(vaccine_data) %>% 
+  tab_header(title = "Number of Vaccinated People in Dominican Republic",
+             subtitle = "Data collected monthly from February to August 2021") %>% 
+  tab_source_note(md("Source: https://github.com/RamiKrispin/coronavirus")) %>% 
+  cols_label(
+    time = html("Month"),
+    monthly_doses_admin = html("Doses_admin"),
+    monthly_people_partially_vaccinated = html("Partially_vaccinated"),
+    monthly_people_fully_vaccinated = html("Fully_vaccinated")
+  )
 
 ```
 
