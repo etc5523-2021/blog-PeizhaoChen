@@ -10,7 +10,7 @@ This assessment is due Fri Sep 3 2021 11.55PM AEST.
 
 My selected country is [Dominican Republic].
 
-The relevant blog post for this assessment is in [FILL].html
+The relevant blog post for this assessment is in [https://etc5523-2021.github.io/blog-PeizhaoChen/].html
 
 - [ ] Selected a country
 - [ ] Website with R markdown 
