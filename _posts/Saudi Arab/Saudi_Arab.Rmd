@@ -1,7 +1,7 @@
 ---
 title: "Covid19 in Saudi Arab"
 description: |
-  fsfsdf
+  How is the Saudi Arabia respond to the pandemic situation?
 author:
   - name: PeizhaoChen
 date: 09-15-2021
@@ -14,20 +14,36 @@ output:
 
 ```{r echo = FALSE,message=FALSE,warning=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE,options(scipen=200))
+knitr::opts_chunk$set(echo = FALSE,
+                      message=FALSE,
+                      warning=FALSE,
+                      options(scipen=200),
+                      tab.align = "center",
+                      fig.align = "center")
 
 library(tidyverse)
-library(kableExtra)
-library(gt)
 library(DT)
 library(knitr)
 library(rpubs)
 library(ggpubr)
 library(here)
+library(plotly)
 ```
 
+# Introdution
+Saudi Arab is a middle east country locating at the the arabian peninsula where is famous for its rich fossil energy ,developed economy and also the divine relic of Mekka(seen i the Figure \@ref(fig:mekka)).But in the pandemic of covid 19,the globe was impacted significantly,so that see how was the Kingdom of Saudi Arabia performed in the passed year.
 
-```{r}
+```{r mekka,fig.cap= "Mekka"}
+
+knitr::include_graphics(here::here("data/mk.jpeg"))
+
+```
+# Graphs
+
+The Figure \@ref(fig:figline) below shows the curve of the confirmed and recovered case are basically in a same shape ,but recovered curve has a month lagging compared with the confirmed curve .We can see the pinnacle of increased confirmed case monthly was achieved in the June 2020 when is also the most serious time for the first wave of global pandemic,since that time the speed of cases increasing was slow down apparently,so in the beginning of 2021 was the lowest level of pandemic.However,as the delta variant of Covid19 virus which is more contagious than original type  was spreading out,the cases soared again and climb to the second peak in July 2021.And death case of covid19 is really smal compare with the confirmed cases in the kingdom, because Saudi Arabia has really high individual income ,so most of patients are able to afford the heathcare and theat,so mosy of them can be healed.
+
+
+```{r }
 
 case_arabia<-read.csv(here::here("data/coronavirus.csv"))%>%
   filter(country =="Saudi Arabia")%>%
@@ -120,3 +136,65 @@ vaccine_arabia2<-read.csv(here::here("data/covid19_vaccine.csv"))%>%
 
 ```
 
+```{r figline,fig.cap= "Overall trend of Saudi Arabia's COVID-19 cases"}
+
+case_arabia_line<-case_arabia%>%
+  ggplot(aes(x=time,
+             y=monthly_cases,
+             group = type,
+             color = factor(type)))+
+  geom_line()+
+  theme(axis.title =  element_text(size=12,face = "bold"),
+        axis.text.x =   element_text(angle=90, 
+                                     hjust = 2,
+                                     size=8),
+        strip.text.x = element_text(size=8, angle=0))+
+  labs(x = "Time",
+       y = "Increased Counts per month",
+       title = "The trend of Covid19 cases")
+  
+
+ggplotly(case_arabia_line)
+```
+
+In the Figure \@ref(fig:figbar),that is a count interesting data,because the bar of fully and partially vaccinated people is missing from February to Jun while the total doses admin was still accumulating.That is wired because the dose admin is the sum of partially and fully vaccination,so there is two interpretation,the government of Saudi Arabia was storing vaccines from February and started to use them in July otherwise that is just simplely missing value due to the kingdom did sumbit them data to world bank.Beside that,the vaccination situation in Saudi Arabia is quit promising,number of people who fully vaccinated is almost half of the total dose admin.
+
+```{r figbar,fig.cap= "Overall trend of Saudi Arabia's vaccination"}
+case_arabia_bar<-vaccine_arabia%>%
+  select(1:4)%>%
+  pivot_longer(cols = -date,
+               names_to = "variable",
+               values_to = "count")%>%
+  ggplot(aes(x=date,
+             y=count,
+             fill = variable))+
+  geom_col(position='dodge')+
+  theme(axis.title =  element_text(size=12,face = "bold"),
+        axis.text.x =   element_text(angle=90, 
+                                     hjust = 2,
+                                     size=8),
+        strip.text.x = element_text(size=8, angle=0))+
+  labs(x = "Time",
+       y = "accumulated Counts",
+       title = "The trend of vaccination")
+
+ggplotly(case_arabia_bar)
+```
+
+# References
+
+- Bob Rudis (2020). hrbrthemes: Additional Themes, Theme Components and Utilities for 'ggplot2'. R package version 0.8.0. https://CRAN.R-project.org/package=hrbrthemes
+
+- C. Sievert. Interactive Web-Based Data Visualization with R, plotly, and shiny. Chapman and Hall/CRC Florida, 2020.
+
+- H. Wickham. ggplot2: Elegant Graphics for Data Analysis.Springer-Verlag New York, 2016.
+
+- Hadley Wickham (2021). tidyr: Tidy Messy Data. R package version 1.1.3. https://CRAN.R-project.org/package=tidyr
+
+- Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.7. https://CRAN.R-project.org/package=dplyr
+
+- Colorado at: <https://covid19.colorado.gov/data)>
+
+- World Health Organization (WHO) at: <https://www.who.int/>
+
+- DXY.cn. Pneumonia. 2020. at: <https://ncov.dxy.cn/ncovh5/view/pneumonia.>
