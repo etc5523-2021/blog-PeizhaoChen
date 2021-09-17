@@ -1,18 +1,15 @@
-name: "Blog1"
-title: "Blog Dominican Republic"
+name: "Peizhaohen-BlogEntry"
+title: "Blog Dominican Republic&Saudi Arab"
 description: |
-  Blog Dominican Republic
-output_dir: "_site"
+  PeizhaoChen's Blog for ETC5523
+output_dir: "docs"
 navbar:
-  title: "Peizhao Chen's Blog"
   right:
-    - text: "Pandemic in Donimican Republic"
+    - text: "Home"
       href: index.html
+    - text: "Posts"
+      href: post.html
     - text: "About"
       href: about.html
 output:
-  html_document:
-    theme: cosmo
-    include: 
-      after_body: footer.html
-   
+    distill::distill_article

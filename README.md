@@ -2,7 +2,7 @@
 
 
 This is the blog of [Peizhao Chen].
-The URL of this blog is [].
+The URL of this blog is [https://etc5523-2021.github.io/blog-PeizhaoChen/].
 
 ## Blog Post 1
 

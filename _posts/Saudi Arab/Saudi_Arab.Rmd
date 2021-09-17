@@ -1,0 +1,122 @@
+---
+title: "Covid19 in Saudi Arab"
+description: |
+  fsfsdf
+author:
+  - name: PeizhaoChen
+date: 09-15-2021
+output:
+  distill::distill_article:
+    self_contained: false
+    toc: true
+    toc_float: true
+---
+
+```{r echo = FALSE,message=FALSE,warning=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE,message=FALSE,warning=FALSE,options(scipen=200))
+
+library(tidyverse)
+library(kableExtra)
+library(gt)
+library(DT)
+library(knitr)
+library(rpubs)
+library(ggpubr)
+library(here)
+```
+
+
+```{r}
+
+case_arabia<-read.csv(here::here("data/coronavirus.csv"))%>%
+  filter(country =="Saudi Arabia")%>%
+  select("date",
+         "country",
+         "type",
+         "cases")%>%
+  separate(col= date,
+           into = c("year","month","day")
+           , "-")%>%
+  group_by(type,
+           year,
+           month)%>%
+  summarise(monthly_cases=sum(cases))%>%
+  unite("time", year, month,sep='-')
+
+case_arabia_wider<-case_arabia%>%
+  pivot_wider(id_cols = time,
+              names_from = type,
+              values_from = monthly_cases)
+
+```
+
+```{r}
+
+vaccine_arabia<-read.csv(here::here("data/covid19_vaccine.csv"))%>%
+  filter(country_region =="Saudi Arabia")%>%
+  select(2:5)%>%
+  filter(date %in% c("2/15/2021",
+                     "2/28/2021",
+                     "3/15/2021",
+                     "3/30/2021",
+                     "4/15/2021",
+                     "4/30/2021",
+                     "5/15/2021",
+                     "5/30/2021",
+                     "6/15/2021",
+                     "6/30/2021",
+                     "7/15/2021",
+                     "7/30/2021",
+                     "8/15/2021",
+                     "8/30/2021"
+                     ))%>%
+  mutate("Fully vaccinated rate" = people_fully_vaccinated/3255000)
+
+
+```
+
+```{r}
+
+vaccine_arabia2<-read.csv(here::here("data/covid19_vaccine.csv"))%>%
+  filter(country_region =="Saudi Arabia")%>%
+  select(2:5)%>%
+  filter(date %in% c("2/28/2021",
+                     "3/30/2021",
+                     "4/30/2021",
+                     "5/30/2021",
+                     "6/30/2021",
+                     "7/30/2021",
+                     "8/30/2021"
+                     ))%>%
+  pivot_longer(cols = -date,
+               names_to = "Type",
+               values_to = "cases")%>%
+  pivot_wider(id_cols = Type,
+              names_from = date,
+              values_from = cases)%>%
+  rename(Februray="2/28/2021",
+         March="3/30/2021",
+         April="4/30/2021",
+         May="5/30/2021",
+         June="6/30/2021",
+         July="7/30/2021",
+         August ="8/30/2021")%>%
+  mutate('2021-03'=March-Februray,
+         "2021-04"=April-March,
+         "2021-05"=May-April,
+         "2021-06"=June-May,
+         "2021-07"=July-June,
+         "2021-08"=August-July)%>%
+  select(Type,
+         9:14)%>%
+  pivot_longer(cols = -Type,
+               names_to = "time",
+               values_to = "vaccinated_people")%>%
+  pivot_wider(id_cols = time,
+              names_from = Type,
+              values_from = vaccinated_people)
+
+
+```
+
